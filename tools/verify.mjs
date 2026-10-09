@@ -112,7 +112,17 @@ await page.waitForTimeout(1300);
 check('L2 フロー① 登録後に頼み直しても二重に登録されない', (await countAI()) === 6 && await page.getByRole('button', { name: 'この予定で登録する' }).count() === 0);
 await page.goto(`${ORIGIN}/index.html#/schedule`);
 check('L2 フロー① 予定画面に「AIが追加」6件', await page.locator('.ev[data-ai="1"]').count() === 6);
+// 提出用の写真は、提案（08）と同じ朝の案をそのまま登録した状態で撮る
+await page.evaluate(() => localStorage.clear());
+await page.goto(`${ORIGIN}/index.html#/today`);
+await page.reload();
+await page.getByRole('button', { name: '相談する' }).click();
+await page.locator('[data-testid="plan-card"]').waitFor({ timeout: 5000 });
+await page.getByRole('button', { name: 'この予定で登録する' }).click();
+await page.goto(`${ORIGIN}/index.html#/schedule`);
 await shoot('09-schedule-after');
+await page.evaluate(() => localStorage.clear());
+await page.reload();
 
 // フロー② 昨日の未完了を明日へ
 const tasks = () => page.evaluate(() => JSON.parse(localStorage.getItem('msp-ai-demo-v1')).tasks);
