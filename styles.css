@@ -78,7 +78,8 @@ svg { display: block; }
   background: rgba(255,255,255,.14); color: #fff; white-space: nowrap;
 }
 
-.view { padding: 20px 16px 140px; outline: none; }
+.view { padding: 20px 16px 8px; outline: none; }
+.example-note { margin: 0; padding: 16px 16px 140px; font-size: 18px; color: var(--muted); }
 
 /* ---- 下の「話しかける」 ---- */
 .talkbar {
@@ -321,6 +322,7 @@ svg { display: block; }
 .layers { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
 .layers-title { font-family: var(--serif); font-size: 21px; font-weight: 700; color: var(--navy); text-align: center; }
 .layer { display: block; border-radius: 14px; padding: 12px 14px; text-decoration: none; }
+.layer.l3 { padding: 12px 8px; }
 .layer b { display: block; font-size: 19px; }
 .layer span { display: block; font-size: 18px; }
 .layer.l1 { background: var(--paper-warm); border: 1px solid #e3d6bd; }
@@ -329,7 +331,7 @@ svg { display: block; }
 .layer.l4 { background: var(--brass-dark); color: #fff; }
 .layer.l5 { background: var(--navy-soft); border: 1px solid #c6d0de; }
 .arrow { text-align: center; color: var(--muted); font-size: 18px; line-height: 1; }
-.modgrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+.modgrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
 .mod { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 84px; padding: 8px 2px;
   border-radius: 12px; border: 1px solid var(--line); background: #fff; text-decoration: none; color: var(--ink); font-weight: 700; font-size: 18px; cursor: pointer; text-align: center; }
 .mod svg { width: 30px; height: 30px; color: var(--navy); }
@@ -389,7 +391,8 @@ svg { display: block; }
 .terms dd { margin: 0 0 6px 1em; }
 .quiz-result, .prof { margin-top: 10px; font-weight: 700; color: var(--ok); }
 .six-fn { margin: 0; padding-left: 1.4em; }
-.six-fn li + li { margin-top: 4px; }
+.six-fn li + li { margin-top: 6px; }
+.six-fn li b { display: block; }
 
 .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
 .photo { margin: 0; background: var(--paper-white); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }

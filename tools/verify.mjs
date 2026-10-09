@@ -175,14 +175,38 @@ const ex = page.locator('[data-testid="exercise-card"]');
 await ex.waitFor({ timeout: 5000 });
 const exText = await ex.innerText();
 check('L2 フロー⑥ 提案が健康・関心情報・大学をまたぐ', exText.includes('歩数') && exText.includes('朝歩こう会') && exText.includes('健康長寿学部'));
-const avg = await page.evaluate((k) => { const s = JSON.parse(localStorage.getItem(k)); const xs = s.health.filter((h) => h.kind === 'steps'); return Math.round(xs.reduce((a, h) => a + h.value, 0) / xs.length); }, KEY);
-check('L2 フロー⑥ 歩数の平均は記録から計算した値', exText.includes(avg.toLocaleString('ja-JP') + '歩'), `記録の平均=${avg}`);
+const avg = await page.evaluate((k) => { const s = JSON.parse(localStorage.getItem(k)); const d = new Date(); const t = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; const xs = s.health.filter((h) => h.kind === 'steps' && h.date !== t); return Math.round(xs.reduce((a, h) => a + h.value, 0) / xs.length); }, KEY);
+check('L2 フロー⑥ 歩数の平均は記録から計算した値（きのうまで）', exText.includes(avg.toLocaleString('ja-JP') + '歩'), `記録の平均=${avg}`);
 await shoot('22-cross-domain');
 const ev0 = (await st()).events.length, tk0 = (await st()).tasks.length;
 check('L2 フロー⑥ 承認前は何も増えない', ev0 === 6 && tk0 === 8);
 await page.getByRole('button', { name: '予定とやることに入れる' }).click();
 const s6 = await st();
 check('L2 フロー⑥ 承認で予定1件とやること1件が増える', s6.events.length === 7 && s6.tasks.length === 9 && s6.events.some((e) => e.ai && e.title.includes('朝歩こう会')));
+
+// 健康の画面：AIの平均と最少日は、同じ物差し（きのうまで）で記録と一致する
+await page.goto(`${ORIGIN}/index.html#/health`);
+const hint = await page.locator('.ai-hint').innerText();
+const low = await page.evaluate((k) => { const s = JSON.parse(localStorage.getItem(k)); const d = new Date(); const t = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; return Math.min(...s.health.filter((h) => h.kind === 'steps' && h.date !== t).map((h) => h.value)); }, KEY);
+check('L2 健康：AIの平均と最少日は同じ物差しで記録と一致', hint.includes(avg.toLocaleString('ja-JP') + '歩') && hint.includes(low.toLocaleString('ja-JP') + '歩'), `平均=${avg} 最少=${low}`);
+
+// フロー⑥b 登録を外した会のことは言わない
+await fresh('feeds');
+await page.locator('.source', { hasText: '朝歩こう会' }).getByRole('button', { name: '登録を外す' }).click();
+await page.goto(`${ORIGIN}/index.html#/chat`);
+await page.getByRole('button', { name: '最近運動不足だから、何か始めたい' }).click();
+await page.locator('[data-testid="exercise-card"]').waitFor({ timeout: 5000 });
+const ex2 = await page.locator('[data-testid="exercise-card"]').innerText();
+check('L2 フロー⑥b 登録を外した会を「登録している」と言わない', !ex2.includes('登録している「朝歩こう会」') && ex2.includes('まだ登録されていません'));
+
+// ホームの学びの進み具合と、大学の受講数が一致する
+await fresh();
+const homeProg = await page.locator('.summary', { hasText: '学びの進み具合' }).innerText();
+await page.goto(`${ORIGIN}/index.html#/univ/f1`);
+const courseTxt = await page.locator('[data-testid="course"]').first().innerText();
+const doneHome = (homeProg.match(/(\d+)\s*\/\s*8回/) || [])[1], doneUniv = (courseTxt.match(/受講ずみ (\d+)/) || [])[1];
+check('L2 ホームと大学の受講数が一致', doneHome !== undefined && doneHome === doneUniv, `ホーム=${doneHome} 大学=${doneUniv}`);
+await page.goto(`${ORIGIN}/index.html#/chat`);
 
 // フロー⑦ 学部をつくる（12週の計画 → 承認で学部ができる）
 await page.getByRole('button', { name: '地元の歴史を学ぶ学部をつくって' }).click();
@@ -215,6 +239,7 @@ check('L2 フロー⑨ 言葉で探せる', (await page.locator('#diary-list .di
 await page.goto(`${ORIGIN}/index.html#/lecture/f1/c1/l1`);
 await page.getByRole('button', { name: '続けられる小さな工夫から始める' }).click();
 check('L2 フロー⑩ 小テストの正誤が出る', (await page.locator('#quiz-result').innerText()).includes('正解'));
+await page.goto(`${ORIGIN}/index.html#/lecture/f1/c1/l3`);
 const c0 = (await st()).candidates.length;
 await page.getByRole('button', { name: '受講した' }).click();
 check('L2 フロー⑩ 受講すると「覚えるか」の候補が増える（勝手には覚えない）', (await st()).candidates.length === c0 + 1);
@@ -231,6 +256,7 @@ check('L2 フロー⑪ 写真とメモを保存できる', (await st()).photos.l
 // フロー⑫ 機能を足す（育つアプリ）
 await page.goto(`${ORIGIN}/index.html#/all`);
 await page.locator('.mod.off', { hasText: '投資' }).click();
+check('L2 足していない機能には記録が入っていない（育つアプリ）', (await st()).invest.length === 0 && (await st()).life.length === 0);
 check('L2 フロー⑫ 「すべて」から機能を足せる', (await st()).active.invest === true && (await page.locator('a.mod', { hasText: '投資' }).count()) === 1);
 
 // フロー⑬ 書き出し

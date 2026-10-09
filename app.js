@@ -44,12 +44,13 @@
   function lec(id, title, src, points, terms, quiz) {
     return { id: id, title: title, src: src, done: false, points: points, terms: terms || [], quiz: quiz || null };
   }
+  function doneLec(l) { l.done = true; return l; }
   function seedUniv() {
     return [
       { id: 'f1', name: '健康長寿学部', desc: '食事・栄養、運動、睡眠、健康習慣を体系的に学ぶ', courses: [
         { id: 'c1', name: '予防栄養学の基礎', plan: '全8回・1回45分', lectures: [
-          lec('l1', '第1回　食事と体のつながり', 'YouTube（大学の公開講座の例）', ['毎日の食事は、体をつくる材料になる', '一度に変えるより、続けられる小さな工夫が大切とされている', '気になる体の変化は、医師に相談する'], [['栄養素', '食べ物にふくまれ、体の働きを助ける成分']], { q: '食事を見直すとき、よいとされる進め方はどれ？', choices: ['一度に全部を変える', '続けられる小さな工夫から始める'], answer: 1 }),
-          lec('l2', '第2回　たんぱく質と筋肉', 'Podcast（栄養の専門家の解説の例）', ['筋肉の材料のひとつが、たんぱく質', '食事と体を動かすことを組み合わせるのが大切とされている'], [['たんぱく質', '肉・魚・卵・大豆などに多い栄養素']], { q: '筋肉の材料のひとつはどれ？', choices: ['たんぱく質', '食物繊維'], answer: 0 }),
+          doneLec(lec('l1', '第1回　食事と体のつながり', 'YouTube（大学の公開講座の例）', ['毎日の食事は、体をつくる材料になる', '一度に変えるより、続けられる小さな工夫が大切とされている', '気になる体の変化は、医師に相談する'], [['栄養素', '食べ物にふくまれ、体の働きを助ける成分']], { q: '食事を見直すとき、よいとされる進め方はどれ？', choices: ['一度に全部を変える', '続けられる小さな工夫から始める'], answer: 1 })),
+          doneLec(lec('l2', '第2回　たんぱく質と筋肉', 'Podcast（栄養の専門家の解説の例）', ['筋肉の材料のひとつが、たんぱく質', '食事と体を動かすことを組み合わせるのが大切とされている'], [['たんぱく質', '肉・魚・卵・大豆などに多い栄養素']], { q: '筋肉の材料のひとつはどれ？', choices: ['たんぱく質', '食物繊維'], answer: 0 })),
           lec('l3', '第3回　食物繊維と腸', 'YouTube（公的機関の解説動画の例）', ['野菜・海藻・きのこなどに多い', '水分も一緒にとることが大切とされている'], [['食物繊維', '体で消化されにくい成分。おなかの調子を整える働きがあるとされる']], null)
         ]},
         { id: 'c2', name: '無理なく続ける運動', plan: '全6回・1回30分', lectures: [
@@ -63,7 +64,7 @@
       ]},
       { id: 'f3', name: '資産形成・経済学部', desc: '資産運用、経済、金融市場、リスク、税のしくみを理解する', courses: [
         { id: 'c4', name: 'はじめての資産運用', plan: '全6回・1回30分', lectures: [
-          lec('l6', '第1回　新NISAのしくみ', 'YouTube（金融機関の解説動画の例）', ['投資で得た利益に、税金がかからない国の制度', '2024年から新しい制度になった', '投資するかどうかは、自分で決める'], [['新NISA', '少額投資非課税制度。2024年から始まった新しい形']], null)
+          lec('l6', '第1回　新NISAのしくみ', 'YouTube（金融機関の解説動画の例）', ['決められた投資枠の範囲内で、投資で得た利益に税金がかからない国の制度', '2024年から新しい制度になった', '投資するかどうかは、自分で決める'], [['新NISA', '少額投資非課税制度。2024年から始まった新しい形']], null)
         ]}
       ]},
       { id: 'f4', name: '人生後半デザイン学部', desc: '生きがい、心理学、コミュニティ、社会参加、趣味を探究する', courses: [
@@ -93,7 +94,7 @@
         { id: 't3', date: key(YESTERDAY), title: '朝の散歩', done: true },
         { id: 't4', date: key(TODAY), title: '牛乳と卵を買う', done: false },
         { id: 't5', date: key(TODAY), title: '書類の整理（30分）', done: false },
-        { id: 't6', date: key(TODAY), title: '第3回の復習ノート', done: false },
+        { id: 't6', date: key(TODAY), title: '第3回の教材を読んでおく', done: false },
         { id: 't7', date: key(TODAY), title: 'いすスクワット 10回', done: false },
         { id: 't8', date: key(TOMORROW), title: '清掃活動の軍手を用意', done: false }
       ],
@@ -111,12 +112,12 @@
       health: [],
       diary: [
         { id: 'd1', date: daysAgo(3), text: '朝の散歩で、川沿いの道に新しいベンチができていた。少し座って、季節の変わり目を感じた。' },
-        { id: 'd2', date: daysAgo(2), text: '読書会で、人生の後半に新しい役割を持つ話になった。自分にできることを考えたい。' },
+        { id: 'd2', date: daysAgo(2), text: '公民館の講座で、人生の後半に新しい役割を持つ話を聞いた。自分にできることを考えたい。' },
         { id: 'd3', date: daysAgo(1), text: '孫から電話。運動会の練習をがんばっているらしい。散歩の距離を少しのばした。' }
       ],
       photos: [
         { id: 'p1', date: daysAgo(3), memo: '川沿いの散歩道', art: 'walk' },
-        { id: 'p2', date: daysAgo(2), memo: '図書館の読書会', art: 'book' },
+        { id: 'p2', date: daysAgo(2), memo: '公民館の講座のテキスト', art: 'book' },
         { id: 'p3', date: daysAgo(6), memo: '家庭菜園のミニトマト', art: 'garden' }
       ],
       sources: [
@@ -126,15 +127,8 @@
         { id: 's4', type: 'youtube', name: '栄養学の公開講座チャンネル', note: '大学の教材候補' },
         { id: 's5', type: 'podcast', name: '人生後半の学び番組', note: '散歩しながら聞く' }
       ],
-      invest: [
-        { id: 'i1', theme: '新NISA', note: 'しくみを理解したい' },
-        { id: 'i2', theme: '為替のニュース', note: '円安・円高が暮らしにどう関わるか' }
-      ],
-      life: [
-        { id: 'y1', kind: '価値観', text: '人の役に立っていると感じられることが、いちばんの張り合い' },
-        { id: 'y2', kind: '経験', text: '長く会社で働き、人を育てる役割をしてきた' },
-        { id: 'y3', kind: '目標', text: '会社の外に、自分の役割と居場所をつくる' }
-      ],
+      invest: [],
+      life: [],
       univ: seedUniv(),
       chat: []
     };
@@ -177,8 +171,9 @@
   function tasksOn(k) { return state.tasks.filter(function (x) { return x.date === k; }); }
   function remembers(re) { return state.memories.some(function (m) { return re.test(m.text); }); }
   function healthOf(kind) { return state.health.filter(function (h) { return h.kind === kind; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; }); }
+  // 今日はまだ途中なので、きのうまでの6日で数える
   function avgSteps() {
-    var from = daysAgo(6), xs = healthOf('steps').filter(function (h) { return h.date >= from; });
+    var from = daysAgo(6), to = daysAgo(1), xs = healthOf('steps').filter(function (h) { return h.date >= from && h.date <= to; });
     if (!xs.length) return 0;
     return Math.round(xs.reduce(function (a, h) { return a + +h.value; }, 0) / xs.length);
   }
@@ -295,7 +290,7 @@
       case 'exercise':
         if (state.events.some(function (e) { return e.walkClub; })) return { kind: 'text', html: '来週土曜の「朝歩こう会」は、もう予定に入っています。<a href="#/schedule">予定を見る</a>' };
         supersede('exercise');
-        return { kind: 'exercise', id: nid('x'), status: 'pending', avg: avgSteps(), thirty: remembers(/30分/) };
+        return { kind: 'exercise', id: nid('x'), status: 'pending', avg: avgSteps(), thirty: remembers(/30分/), club: state.sources.some(function (s) { return /朝歩こう会/.test(s.name); }) };
       case 'faculty':
         supersede('faculty');
         var tp = topicOf(text);
@@ -308,11 +303,11 @@
       case 'diary':
         var from = daysAgo(6), ds = state.diary.filter(function (d) { return d.date >= from; });
         if (!ds.length) return { kind: 'text', html: 'この1週間の日記は、まだありません。<a href="#/diary">日記を書く</a>' };
-        var words = ['散歩', '読書会', '孫', '役割', '家族', '大学', '運動'].filter(function (w) { return ds.some(function (d) { return d.text.indexOf(w) >= 0; }); });
+        var words = ['散歩', '講座', '孫', '役割', '家族', '大学', '運動'].filter(function (w) { return ds.some(function (d) { return d.text.indexOf(w) >= 0; }); });
         return { kind: 'text', html: 'この1週間の日記は <b>' + ds.length + '件</b> です。よく出てくる言葉は「' + esc(words.slice(0, 3).join('」「') || 'なし') + '」でした。<br>' +
-          (words.indexOf('役割') >= 0 ? '読書会のあとに「自分にできることを考えたい」と書かれていますね。人生後半デザイン学部の「役割と居場所」の講義が参考になりそうです。<br><a href="#/lecture/f4/c5/l7">講義を開く</a>' : '<a href="#/diary">日記を見る</a>') };
+          (words.indexOf('役割') >= 0 ? '公民館の講座のあとに「自分にできることを考えたい」と書かれていますね。人生後半デザイン学部の「役割と居場所」の講義が参考になりそうです。<br><a href="#/lecture/f4/c5/l7">講義を開く</a>' : '<a href="#/diary">日記を見る</a>') };
       case 'invest':
-        return { kind: 'text', html: '新NISAは、投資で得た利益に税金がかからない国の制度で、2024年から新しい形になりました。<br>くわしくは、資産形成・経済学部の講義で学べます。投資するかどうかの判断は、ご自身でなさってください。<br><a href="#/lecture/f3/c4/l6">講義を開く</a>' };
+        return { kind: 'text', html: '新NISAは、年間の投資枠などの範囲内で、投資で得た利益に税金がかからない国の制度です。2024年から新しい形になりました。<br>くわしくは、資産形成・経済学部の講義で学べます。投資するかどうかの判断は、ご自身でなさってください。<br><a href="#/lecture/f3/c4/l6">講義を開く</a>' };
       case 'term':
         return { kind: 'text', html: 'ことばの意味を、やさしく説明します。この試作版では「新NISAってなに？」で試せます。製品版では、わからないことばを大学の講義につなぎます。' };
       case 'thu':
@@ -359,11 +354,11 @@
       aiSays('来週の予定に <b>6件</b> 登録しました。前の日の夜に、お知らせします。<br><a href="#/schedule">予定を見る</a>');
       toast('予定に6件を登録しました'); return true;
     },
-    exercise: function () {
+    exercise: function (b) {
       if (state.events.some(function (e) { return e.walkClub; })) return false;
-      state.events.push({ id: nid('e'), date: key(nextWeek(6)), time: '9:00', title: '朝歩こう会に体験参加', ai: true, walkClub: true });
+      state.events.push({ id: nid('e'), date: key(nextWeek(6)), time: '9:00', title: b.club ? '朝歩こう会に体験参加' : '朝のウォーキング', ai: true, walkClub: true });
       state.tasks.push({ id: nid('t'), date: key(nextWeek(5)), title: '歩きやすい靴と水筒を用意', done: false, ai: true });
-      aiSays('来週土曜の「朝歩こう会」を予定に入れ、前の日のやることに「歩きやすい靴と水筒を用意」を足しました。<br><a href="#/schedule">予定を見る</a>');
+      aiSays('来週土曜の' + (b.club ? '「朝歩こう会」' : '朝のウォーキング') + 'を予定に入れ、前の日のやることに「歩きやすい靴と水筒を用意」を足しました。<br><a href="#/schedule">予定を見る</a>');
       toast('予定とやることに追加しました'); return true;
     },
     faculty: function (b) {
@@ -423,7 +418,7 @@
   function renderToday() {
     var evs = eventsOn(key(TODAY)), tks = tasksOn(key(TODAY));
     var c1 = find(find(state.univ, 'f1').courses, 'c1');
-    var doneN = Math.min(8, 2 + c1.lectures.filter(function (l) { return l.done; }).length);
+    var doneN = c1.lectures.filter(function (l) { return l.done; }).length;
     var tiles = [['#/schedule', 'cal', '予定'], ['#/tasks', 'task', 'やること'], ['#/health', 'health', '健康'], ['#/univ', 'univ', '大学'], ['#/diary', 'diary', '日記'], ['#/all', 'all', 'すべて']];
     var hint = planApproved()
       ? '来週の運動と勉強の予定が入りました。前の日の夜に、お知らせしますね。'
@@ -458,7 +453,6 @@
         '<a class="card summary" href="#/univ"><div class="summary-head"><h2>学びの進み具合</h2></div>' +
           '<p style="margin-top:8px">予防栄養学の基礎　<b>' + doneN + '</b> / 8回</p><div class="progress" role="img" aria-label="8回中' + doneN + '回"><span style="width:' + Math.round(doneN / 8 * 100) + '%"></span></div></a>' +
       '</div>' +
-      '<p class="note">※試作版に出てくる予定や記録は、説明のための例です。</p>' +
       '<div class="reset"><a class="btn quiet" href="#/data">データ管理</a></div>';
   }
 
@@ -490,15 +484,16 @@
     if (b.kind === 'exercise') {
       var rows = [];
       if (b.thirty) rows.push(['歩くのは30分くらいが続けやすい、と伺っています', '覚えていること']);
-      rows.push(['ひとりより仲間と一緒のほうが続けやすいので、会への参加を提案します', 'AIの提案']);
+      if (b.club) rows.push(['ひとりより仲間と一緒のほうが続けやすいので、会への参加を提案します', 'AIの提案']);
       return '<div class="bubble wide" data-testid="exercise-card">' +
         '<p>' + NAME + 'さんの記録と関心をまたいで、合いそうなものを探しました。</p>' +
         '<div class="plan"><ul>' +
-          '<li><span class="d">健康の記録</span><span>この1週間の歩数は、1日平均 <b>' + Number(b.avg).toLocaleString('ja-JP') + '歩</b> でした</span></li>' +
-          '<li><span class="d">関心情報（コミュニティ）</span><span>登録している「朝歩こう会」が、毎週土曜 9:00 に公園で集まっています</span></li>' +
+          '<li><span class="d">健康の記録</span><span>きのうまでの6日間の歩数は、1日平均 <b>' + Number(b.avg).toLocaleString('ja-JP') + '歩</b> でした</span></li>' +
+          (b.club ? '<li><span class="d">関心情報（コミュニティ）</span><span>登録している「朝歩こう会」が、毎週土曜 9:00 に公園で集まっています</span></li>'
+                  : '<li><span class="d">関心情報（コミュニティ）</span><span>地域の会は、まだ登録されていません。<a href="#/feeds">関心情報</a>に登録すると、ここで探します</span></li>') +
           '<li><span class="d">大学</span><span>健康長寿学部に「歩くことから始める」の講義があります<br><a href="#/lecture/f1/c2/l4">講義を開く</a></span></li>' +
         '</ul></div>' + why(rows) +
-        '<p style="margin-top:12px"><b>' + esc(label(nextWeek(6))) + ' 9:00</b>　朝歩こう会に体験参加して、前の日に「歩きやすい靴と水筒を用意」をやることに入れましょうか？</p>' +
+        '<p style="margin-top:12px"><b>' + esc(label(nextWeek(6))) + ' 9:00</b>　' + (b.club ? '朝歩こう会に体験参加して' : '朝のウォーキングをして') + '、前の日に「歩きやすい靴と水筒を用意」をやることに入れましょうか？</p>' +
         cardActions(b, '予定とやることに入れる') + '</div>';
     }
     if (b.kind === 'faculty') {
@@ -636,7 +631,7 @@
     var out = [], lab = [];
     for (var i = n - 1; i >= 0; i--) {
       var k = daysAgo(i), x = healthOf(kind).filter(function (h) { return h.date === k; }).pop();
-      out.push(x ? +x.value : 0); lab.push(md(addDays(TODAY, -i)));
+      out.push(x ? +x.value : 0); lab.push(i === 0 ? '今日' : md(addDays(TODAY, -i)));
     }
     return [out, lab];
   }
@@ -655,8 +650,8 @@
         '<label>種類<select name="kind"><option value="steps">歩数（歩）</option><option value="weight">体重（kg）</option><option value="sleep">睡眠（時間）</option><option value="meal">食事（メモ）</option><option value="exercise">運動（メモ）</option></select></label>' +
         '<label>内容<input type="text" name="value" required placeholder="例：6500（歩数のとき）"></label>' +
         '<button class="btn block" type="submit">記録する</button></form>' +
-      '<section class="ai-hint"><div class="avatar" aria-hidden="true">AI</div><p>この1週間の歩数は、1日平均 <b>' + avgSteps().toLocaleString('ja-JP') + '歩</b> です。' + lowDay(st) + '予定の少ない日に、歩く時間を入れてみましょうか？</p></section>' +
-      '<h2 class="section-title">歩数（この7日）</h2><div class="card chart-card" data-testid="steps-chart">' + bars(st[0], st[1], '歩') + '</div>' +
+      '<section class="ai-hint"><div class="avatar" aria-hidden="true">AI</div><p>きのうまでの6日間の歩数は、1日平均 <b>' + avgSteps().toLocaleString('ja-JP') + '歩</b> です。' + lowDay(st) + '予定の少ない日に、歩く時間を入れてみましょうか？</p></section>' +
+      '<h2 class="section-title">歩数（この7日・今日は途中）</h2><div class="card chart-card" data-testid="steps-chart">' + bars(st[0], st[1], '歩') + '</div>' +
       '<h2 class="section-title">体重（kg）</h2><div class="card chart-card">' + (wv.length > 1 ? line(wv, wl, 'kg') : '<p class="empty">記録が2日分そろうとグラフになります</p>') + '</div>' +
       '<h2 class="section-title">睡眠（時間）</h2><div class="card chart-card">' + bars(sl[0], sl[1], '時間') + '</div>' +
       '<h2 class="section-title">食事・運動のメモ</h2><div class="card" style="padding-top:4px;padding-bottom:4px">' +
