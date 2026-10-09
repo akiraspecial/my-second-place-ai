@@ -108,6 +108,7 @@ svg { display: block; }
 .section-title { font-size: 21px; color: var(--navy); margin: 28px 0 12px; }
 .lead { color: var(--muted); }
 .small { font-size: 18px; color: var(--muted); }
+.nw { white-space: nowrap; }
 .section-title .small { font-family: var(--sans); font-weight: 400; }
 .hello .note { margin-top: 8px; font-size: 18px; color: var(--muted); }
 .btn {

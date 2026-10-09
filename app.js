@@ -81,6 +81,8 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  // 「第4回（45分）」のような語の途中で行が割れないようにする
+  function t(s) { return esc(s).replace(/(第\d+回(?:（\d+分）)?|\d+分)/g, '<span class="nw">$1</span>'); }
   function byTime(a, b) {
     var ta = a.time.split(':'), tb = b.time.split(':');
     return (+ta[0] * 60 + +ta[1]) - (+tb[0] * 60 + +tb[1]);
@@ -125,15 +127,17 @@
   // ---------- 台本（AIの返事） ----------
   function remembers(re) { return state.memories.some(function (m) { return re.test(m.text); }); }
   function walkTime() { return state.walkEvening ? '16:30' : '7:00'; }
+  function walkTitle() { return remembers(/30分/) ? 'ウォーキング 30分' : 'ウォーキング'; }
+  function studyTime() { return remembers(/午後/) ? '15:00' : '10:00'; }
   function reviewTime() { return remembers(/日曜の夜/) ? '16:00' : '19:00'; }
   function buildPlan() {
     var w = walkTime();
     return [
-      { date: key(nextWeek(1)), time: w, title: 'ウォーキング 30分', kind: 'walk' },
-      { date: key(nextWeek(2)), time: '15:00', title: '大学「予防栄養学の基礎」第4回（45分）', kind: 'univ', univ: true },
-      { date: key(nextWeek(3)), time: w, title: 'ウォーキング 30分', kind: 'walk' },
-      { date: key(nextWeek(4)), time: '15:00', title: '大学「予防栄養学の基礎」第5回（45分）', kind: 'univ', univ: true },
-      { date: key(nextWeek(6)), time: w, title: 'ウォーキング 30分', kind: 'walk' },
+      { date: key(nextWeek(1)), time: w, title: walkTitle(), kind: 'walk' },
+      { date: key(nextWeek(2)), time: studyTime(), title: '大学「予防栄養学の基礎」第4回（45分）', kind: 'univ', univ: true },
+      { date: key(nextWeek(3)), time: w, title: walkTitle(), kind: 'walk' },
+      { date: key(nextWeek(4)), time: studyTime(), title: '大学「予防栄養学の基礎」第5回（45分）', kind: 'univ', univ: true },
+      { date: key(nextWeek(6)), time: w, title: walkTitle(), kind: 'walk' },
       { date: key(nextWeek(0)), time: reviewTime(), title: '1週間のふりかえり（健康と学び）', kind: 'review' }
     ];
   }
@@ -176,12 +180,13 @@
       case 'thu':
         var thu = nextWeek(4), evs = eventsOn(key(thu));
         var busy = evs.length ? evs.map(function (e) { return e.time + '〜 ' + e.title; }).join('、') : '予定は入っていません';
-        return { kind: 'text', html: esc(label(thu)) + 'は、' + esc(busy) + '。<br>朝7時ごろなら空いています。いつもの30分のウォーキングはいかがですか？' };
+        return { kind: 'text', html: esc(label(thu)) + 'は、' + esc(busy) + '。<br>朝7時ごろなら空いています。' + (remembers(/30分/) ? 'いつもの30分のウォーキングはいかがですか？' : 'ウォーキングはいかがですか？') };
       case 'univ':
         var nextU = state.events.filter(function (e) { return e.univ && fromKey(e.date) > TODAY; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; })[0];
         if (nextU) return { kind: 'text', html: '次の授業は <b>' + esc(label(fromKey(nextU.date)) + ' ' + nextU.time) + '</b> の「' + esc(nextU.title.replace(/^大学「予防栄養学の基礎」/, '')) + '」です。<br><a href="#/univ">大学を開く</a>' };
         return { kind: 'text', html: '今日の14時の第3回のあと、第4回はまだ予定に入っていません。<br>「来週の予定に、運動と大学の勉強を組み込んで」と言っていただければ、空いている時間を探します。' };
       case 'me':
+        if (!state.memories.length) return { kind: 'text', html: 'いまは、覚えていることはありません。覚えてほしいことがあれば、話しかけてください。<br><a href="#/memory">覚えていることを見る</a>' };
         return { kind: 'text', html: 'いま覚えていることは ' + state.memories.length + ' 件です。たとえば「' + esc(state.memories[0] ? state.memories[0].text : '') + '」など。<br>直したいこと・忘れてほしいことは、いつでも変えられます。<br><a href="#/memory">覚えていることを見る</a>' };
       default:
         return { kind: 'text', html: 'この試作版では、下の「話しかける例」から試せます。<br>製品版では、どんな言い方でも受けとめて、予定やタスクに落とし込みます。' };
@@ -267,7 +272,7 @@
       (state.guideClosed ? '' :
       '<section class="guide" aria-label="この試作版の見どころ">' +
         '<h2>はじめての方へ　3分の見どころ</h2>' +
-        '<ol><li>下の「相談する」を押す</li><li>AIの提案を見て「この予定で登録する」</li><li>「予定」に入ったことを確かめる</li><li>「覚えていること」で、AIが何を覚えているかを見る</li></ol>' +
+        '<ol><li>下の「相談する」を押す</li><li>AIの提案を見て「<span class="nw">この予定で登録する</span>」</li><li>「予定」に入ったことを確かめる</li><li>「覚えていること」で、AIが何を覚えているかを見る</li></ol>' +
         '<div class="row"><button class="btn quiet" data-act="close-guide">わかりました</button></div>' +
       '</section>') +
       '<section class="ai-hint">' +
@@ -278,7 +283,7 @@
       '</section>' +
       '<div class="stack" style="margin-top:18px">' +
         '<a class="card summary" href="#/schedule"><div class="summary-head"><h2>今日の予定</h2><span class="count">' + evs.length + '件</span></div>' +
-          '<ul>' + evs.map(function (e) { return '<li><span class="time">' + esc(e.time) + '</span><span>' + esc(e.title) + '</span></li>'; }).join('') + '</ul>' +
+          '<ul>' + evs.map(function (e) { return '<li><span class="time">' + esc(e.time) + '</span><span>' + t(e.title) + '</span></li>'; }).join('') + '</ul>' +
         '</a>' +
         '<a class="card summary" href="#/tasks"><div class="summary-head"><h2>今日のやること</h2><span class="count">' + tks.length + '件</span></div>' +
           '<ul>' + tks.map(function (t) { return '<li><span>' + (t.done ? '✓ ' : '・') + esc(t.title) + '</span></li>'; }).join('') + '</ul>' +
@@ -303,7 +308,7 @@
       return '<div class="bubble wide" data-testid="plan-card">' +
         '<p>来週は <b>火曜の午前に通院</b>、<b>金曜の夜に友人と会食</b>がありますね。空いている時間に、こんな計画はいかがでしょうか。</p>' +
         '<div class="plan"><ul>' + plan.map(function (p) {
-          return '<li><span class="d">' + esc(label(fromKey(p.date))) + '　<span class="t">' + esc(p.time) + '</span></span><span>' + esc(p.title) + '</span></li>';
+          return '<li><span class="d">' + esc(label(fromKey(p.date))) + '　<span class="t">' + esc(p.time) + '</span></span><span>' + t(p.title) + '</span></li>';
         }).join('') + '</ul></div>' +
         '<div class="why"><h3>こう考えました</h3><ul>' +
           (b.why || []).map(function (r) { return '<li>' + esc(r[0]) + ' <span class="from">' + esc(r[1]) + '</span></li>'; }).join('') +
@@ -383,7 +388,7 @@
       var evs = eventsOn(key(d));
       return '<section class="day' + (key(d) === key(TODAY) ? ' is-today' : '') + '"><h2>' + esc(label(d)) + (key(d) === key(TODAY) ? '　今日' : '') + '</h2>' +
         (evs.length ? evs.map(function (e) {
-          return '<div class="ev' + (e.ai ? ' ai' : '') + '"' + (e.ai ? ' data-ai="1"' : '') + '><span class="time">' + esc(e.time) + '</span><span class="title"><span>' + esc(e.title) + '</span>' + (e.ai ? '<span class="badge-ai">AIが追加</span>' : '') + '</span></div>';
+          return '<div class="ev' + (e.ai ? ' ai' : '') + '"' + (e.ai ? ' data-ai="1"' : '') + '><span class="time">' + esc(e.time) + '</span><span class="title"><span>' + t(e.title) + '</span>' + (e.ai ? '<span class="badge-ai">AIが追加</span>' : '') + '</span></div>';
         }).join('') : '<p class="empty">予定はありません</p>') +
       '</section>';
     }
@@ -488,7 +493,7 @@
         break;
       case 'mem-accept':
         var c = state.candidates.find(function (x) { return x.id === id; });
-        if (c) { state.memories.unshift({ id: nid('m'), text: c.text, src: c.src + '（承認ずみ）' }); }
+        if (c) { state.memories.unshift({ id: nid('m'), text: c.text, src: c.src + '・承認ずみ' }); }
         state.candidates = state.candidates.filter(function (x) { return x.id !== id; });
         save(); renderMemory(); toast('覚えました'); break;
       case 'mem-reject':

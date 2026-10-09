@@ -70,7 +70,7 @@ async function audit(screen) {
 // 全体撮影では固定の帯が途中に写り込むので、撮影のときだけ帯を流れに戻す
 async function shoot(name) {
   await page.evaluate(() => document.getElementById('toast').classList.remove('show'));
-  const h = await page.addStyleTag({ content: '.topbar,.talkbar{position:static!important}' });
+  const h = await page.addStyleTag({ content: '.topbar,.talkbar{position:static!important}.toast{display:none!important}' });
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: true });
   await h.evaluate((n) => n.remove());
 }
@@ -149,6 +149,8 @@ await page.getByRole('button', { name: '来週の予定に、運動と大学の�
 await page.locator('[data-testid="plan-card"]').waitFor({ timeout: 5000 });
 const why = await page.locator('[data-testid="plan-card"] .why').innerText();
 check('L2 フロー④ 忘れた記憶は提案の理由に出ない', !why.includes('30分') && why.includes('午後'));
+const planText = await page.locator('[data-testid="plan-card"] .plan').innerText();
+check('L2 フロー④ 忘れた記憶は提案の中身にも使わない', !planText.includes('30分') && planText.includes('15:00'));
 
 check('L1 外部への通信 0件', external.length === 0, external.slice(0, 3).join(' '));
 check('L1 コンソールエラー 0件', errors.length === 0, errors.slice(0, 3).join(' | '));
