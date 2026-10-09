@@ -46,12 +46,12 @@
         { id: 't8', date: key(TOMORROW), title: '清掃活動の軍手を用意', done: false }
       ],
       memories: [
-        { id: 'm1', text: '朝は6時ごろに起きる', src: '9月28日の会話から' },
-        { id: 'm2', text: '歩くのは30分くらいが続けやすい', src: '10月2日の会話から' },
-        { id: 'm3', text: '学ぶのは午後のほうが集中できる', src: '10月5日の会話から' },
-        { id: 'm4', text: '火曜の午前は定期の通院がある', src: '予定から' },
-        { id: 'm5', text: '予防栄養学を学んでいる。食事と運動のつながりに関心がある', src: '大学の登録から' },
-        { id: 'm6', text: '人生後半の居場所づくりについて発信している', src: '自己紹介から' }
+        { id: 'm1', text: '朝は6時ごろに起きる', src: '9月28日の会話から・承認ずみ' },
+        { id: 'm2', text: '歩くのは30分くらいが続けやすい', src: '10月2日の会話から・承認ずみ' },
+        { id: 'm3', text: '学ぶのは午後のほうが集中できる', src: '10月5日の会話から・承認ずみ' },
+        { id: 'm4', text: '火曜の午前は定期の通院がある', src: '予定から・承認ずみ' },
+        { id: 'm5', text: '予防栄養学を学んでいる。食事と運動のつながりに関心がある', src: '大学の登録から・承認ずみ' },
+        { id: 'm6', text: '人生後半の居場所づくりについて発信している', src: '自己紹介から・承認ずみ' }
       ],
       candidates: [
         { id: 'c1', text: '日曜の夜は、家族と電話することが多い', src: 'きのうの会話から' }
@@ -123,7 +123,9 @@
   ];
 
   // ---------- 台本（AIの返事） ----------
+  function remembers(re) { return state.memories.some(function (m) { return re.test(m.text); }); }
   function walkTime() { return state.walkEvening ? '16:30' : '7:00'; }
+  function reviewTime() { return remembers(/日曜の夜/) ? '16:00' : '19:00'; }
   function buildPlan() {
     var w = walkTime();
     return [
@@ -132,7 +134,7 @@
       { date: key(nextWeek(3)), time: w, title: 'ウォーキング 30分', kind: 'walk' },
       { date: key(nextWeek(4)), time: '15:00', title: '大学「予防栄養学の基礎」第5回（45分）', kind: 'univ', univ: true },
       { date: key(nextWeek(6)), time: w, title: 'ウォーキング 30分', kind: 'walk' },
-      { date: key(nextWeek(0)), time: '19:00', title: '1週間のふりかえり（健康と学び）', kind: 'review' }
+      { date: key(nextWeek(0)), time: reviewTime(), title: '1週間のふりかえり（健康と学び）', kind: 'review' }
     ];
   }
   function planApproved() { return state.events.some(function (e) { return e.ai; }); }
@@ -165,7 +167,8 @@
         if (planApproved()) {
           return { kind: 'text', html: '来週の運動と勉強は、もう予定に入っています。<a href="#/schedule">予定を見る</a>と確かめられます。' };
         }
-        return { kind: 'plan', id: nid('p'), status: 'pending', evening: !!state.walkEvening };
+        state.chat.forEach(function (m) { if (m.body && m.body.kind === 'plan' && m.body.status === 'pending') m.body.status = 'superseded'; });
+        return { kind: 'plan', id: nid('p'), status: 'pending', evening: !!state.walkEvening, review: reviewTime(), why: planReasons() };
       case 'carry':
         var m = movableTasks();
         if (!m.length) return { kind: 'text', html: '昨日のやることは、すべて片づいています。おつかれさまでした。' };
@@ -198,8 +201,8 @@
 
   // ---------- 承認 ----------
   function approvePlan(id) {
-    var msg = findMsg(id); if (!msg || msg.body.status !== 'pending') return;
-    buildPlan().forEach(function (p) {
+    var msg = findMsg(id); if (!msg || msg.body.status !== 'pending' || planApproved()) return;
+    buildPlanFor(msg.body).forEach(function (p) {
       state.events.push({ id: nid('e'), date: p.date, time: p.time, title: p.title, ai: true, univ: !!p.univ });
     });
     msg.body.status = 'approved';
@@ -259,6 +262,7 @@
         '<p class="date">' + esc(label(TODAY)) + '</p>' +
         '<h1>こんにちは、' + NAME + 'さん</h1>' +
         '<p class="sub">今日も、自分らしい一日を。</p>' +
+        '<p class="note">※試作版に出てくる予定や記憶は、説明のための例です。</p>' +
       '</section>' +
       (state.guideClosed ? '' :
       '<section class="guide" aria-label="この試作版の見どころ">' +
@@ -302,10 +306,7 @@
           return '<li><span class="d">' + esc(label(fromKey(p.date))) + '　<span class="t">' + esc(p.time) + '</span></span><span>' + esc(p.title) + '</span></li>';
         }).join('') + '</ul></div>' +
         '<div class="why"><h3>こう考えました</h3><ul>' +
-          '<li>歩くのは30分くらいが続けやすい、と伺っています <span class="from">覚えていること</span></li>' +
-          '<li>学ぶのは午後のほうが集中できるので、大学は15時から <span class="from">覚えていること</span></li>' +
-          '<li>通院と会食の日時は避けました <span class="from">予定</span></li>' +
-          '<li>大学は「予防栄養学の基礎」の続き（第4回・第5回） <span class="from">大学</span></li>' +
+          (b.why || []).map(function (r) { return '<li>' + esc(r[0]) + ' <span class="from">' + esc(r[1]) + '</span></li>'; }).join('') +
         '</ul></div>' +
         (b.status === 'pending'
           ? '<p class="wait-note">まだ予定には入れていません。よろしければ登録します。</p>' +
@@ -314,7 +315,9 @@
               (b.evening ? '' : '<button class="btn secondary block" data-act="say" data-text="ウォーキングは夕方にして">ウォーキングは夕方に</button>') +
               '<button class="btn quiet block" data-act="decline" data-id="' + b.id + '">今回はやめておく</button>' +
             '</div>'
-          : b.status === 'approved' ? '<p class="done-note">✓ 登録しました</p>' : '<p class="wait-note">この提案は見送りました。</p>') +
+          : b.status === 'approved' ? '<p class="done-note">✓ 登録しました</p>'
+          : b.status === 'superseded' ? '<p class="wait-note">この案は、下の新しい案に置きかえました。</p>'
+          : '<p class="wait-note">この提案は見送りました。</p>') +
       '</div>';
     }
     if (b.kind === 'carry') {
@@ -333,7 +336,20 @@
   // 提案カードは「出したときの条件」で描く（夕方案と朝案を混ぜない）
   function buildPlanFor(b) {
     var saved = state.walkEvening; state.walkEvening = b.evening;
-    var p = buildPlan(); state.walkEvening = saved; return p;
+    var p = buildPlan(); state.walkEvening = saved;
+    if (b.review) p.forEach(function (x) { if (x.kind === 'review') x.time = b.review; });
+    return p;
+  }
+  // 提案の理由は、そのとき覚えていることから組み立てる（忘れたことは理由に使わない）
+  function planReasons() {
+    var r = [];
+    if (remembers(/30分/)) r.push(['歩くのは30分くらいが続けやすい、と伺っています', '覚えていること']);
+    if (state.walkEvening) r.push(['ご希望に合わせて、ウォーキングは夕方にしました', '会話']);
+    if (remembers(/午後/)) r.push(['学ぶのは午後のほうが集中できるので、大学は15時から', '覚えていること']);
+    r.push(['通院と会食の日時は避けました', '予定']);
+    r.push(['大学は「予防栄養学の基礎」の続き（第4回・第5回）', '大学']);
+    if (remembers(/日曜の夜/)) r.push(['日曜の夜はご家族と電話されることが多いので、ふりかえりは16時に', '覚えていること']);
+    return r;
   }
 
   function renderChat(scroll) {
