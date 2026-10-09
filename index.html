@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Second Place AI｜プロトタイプ</title>
+<meta name="description" content="人生後半の毎日を支えるパーソナルAI秘書「My Second Place AI」のコンセプト・プロトタイプ。AI秘書・自分専用の大学・長期記憶の3つがつながる体験を触って確かめられます。">
+<meta name="theme-color" content="#223a5e">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="back" id="back" href="#/today" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>今日にもどる</span>
+      </a>
+      <div class="brand" id="brand">
+        <span class="brand-name">My Second Place <b>AI</b></span>
+      </div>
+      <span class="demo-badge">試作版</span>
+    </div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <nav class="talkbar" id="talkbar">
+    <a class="talk-btn" href="#/chat">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>AIに話しかける</span>
+    </a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

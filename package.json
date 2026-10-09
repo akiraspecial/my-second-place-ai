@@ -1,0 +1,9 @@
+{
+  "name": "my-second-place-ai-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "description": "My Second Place AI のコンセプト・プロトタイプ（静的サイト）",
+  "type": "module",
+  "scripts": { "verify": "node tools/verify.mjs" },
+  "devDependencies": { "playwright": "1.57.0" }
+}
