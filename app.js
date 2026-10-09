@@ -51,7 +51,7 @@
         { id: 'c1', name: '予防栄養学の基礎', plan: '全8回・1回45分', lectures: [
           doneLec(lec('l1', '第1回　食事と体のつながり', 'YouTube（大学の公開講座の例）', ['毎日の食事は、体をつくる材料になる', '一度に変えるより、続けられる小さな工夫が大切とされている', '気になる体の変化は、医師に相談する'], [['栄養素', '食べ物にふくまれ、体の働きを助ける成分']], { q: '食事を見直すとき、よいとされる進め方はどれ？', choices: ['一度に全部を変える', '続けられる小さな工夫から始める'], answer: 1 })),
           doneLec(lec('l2', '第2回　たんぱく質と筋肉', 'Podcast（栄養の専門家の解説の例）', ['筋肉の材料のひとつが、たんぱく質', '食事と体を動かすことを組み合わせるのが大切とされている'], [['たんぱく質', '肉・魚・卵・大豆などに多い栄養素']], { q: '筋肉の材料のひとつはどれ？', choices: ['たんぱく質', '食物繊維'], answer: 0 })),
-          lec('l3', '第3回　食物繊維と腸', 'YouTube（公的機関の解説動画の例）', ['野菜・海藻・きのこなどに多い', '水分も一緒にとることが大切とされている'], [['食物繊維', '体で消化されにくい成分。おなかの調子を整える働きがあるとされる']], null)
+          lec('l3', '第3回　食物繊維と腸', 'YouTube（公的機関の解説動画の例）', ['野菜・海藻・きのこなどに多い', '水分も一緒にとることが大切とされている'], [['食物繊維', '体で消化されにくい成分。おなかの調子を整える働きがあるとされる']], { q: '食物繊維が多い食べ物はどれ？', choices: ['野菜・海藻・きのこ', '砂糖'], answer: 0 })
         ]},
         { id: 'c2', name: '無理なく続ける運動', plan: '全6回・1回30分', lectures: [
           lec('l4', '第1回　歩くことから始める', 'YouTube（運動指導者の解説の例）', ['自分のペースで、続けられる時間から', '体調がすぐれない日は休む'], [], null)
@@ -288,7 +288,8 @@
         supersede('plan');
         return { kind: 'plan', id: nid('p'), status: 'pending', evening: !!state.walkEvening, review: reviewTime(), why: planReasons() };
       case 'exercise':
-        if (state.events.some(function (e) { return e.walkClub; })) return { kind: 'text', html: '来週土曜の「朝歩こう会」は、もう予定に入っています。<a href="#/schedule">予定を見る</a>' };
+        var wc = state.events.filter(function (e) { return e.walkClub; })[0];
+        if (wc) return { kind: 'text', html: '来週土曜の「' + esc(wc.title) + '」は、もう予定に入っています。<a href="#/schedule">予定を見る</a>' };
         supersede('exercise');
         return { kind: 'exercise', id: nid('x'), status: 'pending', avg: avgSteps(), thirty: remembers(/30分/), club: state.sources.some(function (s) { return /朝歩こう会/.test(s.name); }) };
       case 'faculty':
@@ -442,7 +443,7 @@
       (state.guideClosed ? '' :
       '<section class="guide" aria-label="この試作版の見どころ">' +
         '<h2>はじめての方へ　3分の見どころ</h2>' +
-        '<ol><li>「相談する」を押し、AIの提案を見て「<span class="nw">この予定で登録する</span>」</li><li>「AIに話しかける」で「最近運動不足だから、何か始めたい」を押す（健康・地域の会・大学をまたいだ提案）</li><li>「大学」で、学部・講義・小テストを見る</li><li>「すべて」で、人生の情報がつながる全体像を見る</li></ol>' +
+        '<ol><li>「相談する」を押し、AIの提案を見て「<span class="nw">この予定で登録する</span>」</li><li>「AIに話しかける」で「最近運動不足だから、何か始めたい」を押す（健康・地域の会・大学をまたいだ提案）</li><li>「大学」で「次に受ける講義」を開き、小テストと「受講した」を試す</li><li>「すべて」で、人生の情報がつながる全体像を見る</li></ol>' +
         '<div class="row"><button class="btn quiet" data-act="close-guide">わかりました</button></div>' +
       '</section>') +
       '<div class="stack" style="margin-top:18px">' +
@@ -669,6 +670,7 @@
         (nu ? '<p><b>次の授業</b>　' + esc(label(fromKey(nu.date)) + ' ' + nu.time) + '<br>' + t(nu.title) + '<br><span class="small">予定に入っています</span></p>'
             : '<p><b>次の授業</b>　予防栄養学の基礎 <span class="nw">第4回</span>は、まだ予定に入っていません。</p><button class="btn" style="margin-top:10px" data-act="consult">AIに時間を相談する</button>') +
       '</div>' +
+      '<a class="card next-lecture" href="#/lecture/f1/c1/l3"><span class="small">次に受ける講義（今日 14:00）</span><br><b>予防栄養学の基礎 <span class="nw">第3回</span>　食物繊維と腸</b><br><span class="small">講義ノート・小テストを開く</span></a>' +
       '<h2 class="section-title">学部</h2><div class="stack">' +
         state.univ.map(function (f) {
           var n = 0, d = 0; f.courses.forEach(function (c) { c.lectures.forEach(function (l) { n++; if (l.done) d++; }); });
@@ -769,7 +771,7 @@
   function renderInvest() {
     view.innerHTML = head('投資', '気になる投資のテーマを並べておきます。AIはニュースやことばの説明を集めますが、投資の判断はかわりにしません。') +
       '<form id="f-invest" class="form inline"><label class="grow">テーマを追加<input type="text" name="theme" required placeholder="例：高配当株"></label><button class="btn" type="submit">追加</button></form>' +
-      '<div class="stack" style="margin-top:14px">' + state.invest.map(function (x) {
+      '<div class="stack" style="margin-top:14px">' + (state.invest.length ? '' : '<p class="empty">まだありません。気になるテーマを追加してください</p>') + state.invest.map(function (x) {
         return '<article class="card"><h3>' + esc(x.theme) + '</h3>' + (x.note ? '<p class="small">' + esc(x.note) + '</p>' : '') +
           '<div class="row" style="margin-top:10px"><button class="btn secondary" data-act="say-go" data-text="' + esc(x.theme) + 'ってなに？">AIに聞く</button><button class="btn quiet" data-act="del-invest" data-id="' + x.id + '">外す</button></div></article>';
       }).join('') + '</div>' +

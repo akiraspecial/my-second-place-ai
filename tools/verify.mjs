@@ -239,7 +239,10 @@ check('L2 フロー⑨ 言葉で探せる', (await page.locator('#diary-list .di
 await page.goto(`${ORIGIN}/index.html#/lecture/f1/c1/l1`);
 await page.getByRole('button', { name: '続けられる小さな工夫から始める' }).click();
 check('L2 フロー⑩ 小テストの正誤が出る', (await page.locator('#quiz-result').innerText()).includes('正解'));
-await page.goto(`${ORIGIN}/index.html#/lecture/f1/c1/l3`);
+await page.goto(`${ORIGIN}/index.html#/univ`);
+await page.locator('.next-lecture').click();
+await page.getByRole('button', { name: '野菜・海藻・きのこ' }).click();
+check('L2 フロー⑩ 大学の「次に受ける講義」から、小テストつきの未受講の講義に入れる', (await page.locator('#quiz-result').innerText()).includes('正解'));
 const c0 = (await st()).candidates.length;
 await page.getByRole('button', { name: '受講した' }).click();
 check('L2 フロー⑩ 受講すると「覚えるか」の候補が増える（勝手には覚えない）', (await st()).candidates.length === c0 + 1);
