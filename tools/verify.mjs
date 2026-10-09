@@ -152,6 +152,18 @@ check('L2 フロー④ 忘れた記憶は提案の理由に出ない', !why.incl
 const planText = await page.locator('[data-testid="plan-card"] .plan').innerText();
 check('L2 フロー④ 忘れた記憶は提案の中身にも使わない', !planText.includes('30分') && planText.includes('15:00'));
 
+// フロー⑤ 「午後」を忘れても、火曜午前の通院と重ねない
+await page.evaluate(() => localStorage.clear());
+await page.goto(`${ORIGIN}/index.html#/memory`);
+await page.reload();
+await page.locator('#mem-list .mem', { hasText: '午後' }).getByRole('button', { name: '忘れてもらう' }).click();
+await page.goto(`${ORIGIN}/index.html#/chat`);
+await page.getByRole('button', { name: '来週の予定に、運動と大学の勉強を組み込んで' }).click();
+await page.locator('[data-testid="plan-card"]').waitFor({ timeout: 5000 });
+const plan5 = await page.locator('[data-testid="plan-card"] .plan li').allInnerTexts();
+const tue = plan5.filter((x) => x.includes('（火）'));
+check('L2 フロー⑤ 午後を忘れても火曜の午前に入れない', tue.length === 1 && !/（火）\s*(?:[0-9]|1[01]):/.test(tue[0]), tue.join(' | '));
+
 check('L1 外部への通信 0件', external.length === 0, external.slice(0, 3).join(' '));
 check('L1 コンソールエラー 0件', errors.length === 0, errors.slice(0, 3).join(' | '));
 

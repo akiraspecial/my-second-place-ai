@@ -128,7 +128,7 @@
   function remembers(re) { return state.memories.some(function (m) { return re.test(m.text); }); }
   function walkTime() { return state.walkEvening ? '16:30' : '7:00'; }
   function walkTitle() { return remembers(/30分/) ? 'ウォーキング 30分' : 'ウォーキング'; }
-  function studyTime() { return remembers(/午後/) ? '15:00' : '10:00'; }
+  function studyTime() { return remembers(/午後/) ? '15:00' : '13:30'; }
   function reviewTime() { return remembers(/日曜の夜/) ? '16:00' : '19:00'; }
   function buildPlan() {
     var w = walkTime();
@@ -311,7 +311,7 @@
           return '<li><span class="d">' + esc(label(fromKey(p.date))) + '　<span class="t">' + esc(p.time) + '</span></span><span>' + t(p.title) + '</span></li>';
         }).join('') + '</ul></div>' +
         '<div class="why"><h3>こう考えました</h3><ul>' +
-          (b.why || []).map(function (r) { return '<li>' + esc(r[0]) + ' <span class="from">' + esc(r[1]) + '</span></li>'; }).join('') +
+          (b.why || []).map(function (r) { return '<li>' + t(r[0]) + ' <span class="from">' + esc(r[1]) + '</span></li>'; }).join('') +
         '</ul></div>' +
         (b.status === 'pending'
           ? '<p class="wait-note">まだ予定には入れていません。よろしければ登録します。</p>' +
